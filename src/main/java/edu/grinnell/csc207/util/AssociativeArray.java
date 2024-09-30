@@ -1,6 +1,7 @@
 package edu.grinnell.csc207.util;
 
 import static java.lang.reflect.Array.newInstance;
+import java.util.Arrays;
 
 /**
  * A basic implementation of Associative Arrays with keys of type K
@@ -10,7 +11,7 @@ import static java.lang.reflect.Array.newInstance;
  * @param <K> the key type
  * @param <V> the value type
  *
- * @author Your Name Here
+ * @author Yash Malik
  * @author Samuel A. Rebelsky
  */
 public class AssociativeArray<K, V> {
@@ -46,9 +47,7 @@ public class AssociativeArray<K, V> {
    */
   @SuppressWarnings({ "unchecked" })
   public AssociativeArray() {
-    // Creating new arrays is sometimes a PITN.
-    this.pairs = (KVPair<K, V>[]) newInstance((new KVPair<K, V>()).getClass(),
-        DEFAULT_CAPACITY);
+    this.pairs = (KVPair<K, V>[]) newInstance(KVPair.class, DEFAULT_CAPACITY);
     this.size = 0;
   } // AssociativeArray()
 
@@ -62,7 +61,10 @@ public class AssociativeArray<K, V> {
    * @return a new copy of the array
    */
   public AssociativeArray<K, V> clone() {
-    return null; // STUB
+    AssociativeArray<K, V> newArray = new AssociativeArray<>();
+    newArray.pairs = Arrays.copyOf(this.pairs, this.size);
+    newArray.size = this.size;
+    return newArray;
   } // clone()
 
   /**
@@ -71,7 +73,12 @@ public class AssociativeArray<K, V> {
    * @return a string of the form "{Key0:Value0, Key1:Value1, ... KeyN:ValueN}"
    */
   public String toString() {
-    return "{}"; // STUB
+    StringBuilder returnVal = new StringBuilder();
+    for (int i = 0; i < this.size; i++) {
+      if (i > 0) returnVal.append(", ");
+      returnVal.append(pairs[i].key).append(":").append(pairs[i].value);
+    }
+    return "{" + returnVal + "}";
   } // toString()
 
   // +----------------+----------------------------------------------
@@ -82,16 +89,28 @@ public class AssociativeArray<K, V> {
    * Set the value associated with key to value. Future calls to
    * get(key) will return value.
    *
-   * @param K
-   *   The key whose value we are seeting.
-   * @param V
+   * @param key
+   *   The key whose value we are setting.
+   * @param value
    *   The value of that key.
    *
    * @throws NullKeyException
    *   If the client provides a null key.
    */
   public void set(K key, V value) throws NullKeyException {
-    // STUB
+    if (key == null) {
+      throw new NullKeyException("Key cannot be null");
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        pairs[i].value = value; // Update existing key
+        return;
+      }
+    }
+    if (size >= pairs.length) {
+      expand(); // Expand array if necessary
+    }
+    pairs[size++] = new KVPair<>(key, value); // Add new key/value pair
   } // set(K,V)
 
   /**
@@ -104,7 +123,15 @@ public class AssociativeArray<K, V> {
    *   when the key is null or does not appear in the associative array.
    */
   public V get(K key) throws KeyNotFoundException {
-    return null; // STUB
+    if (key == null) {
+      throw new KeyNotFoundException("Key cannot be null");
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        return pairs[i].value;
+      }
+    }
+    throw new KeyNotFoundException("Key not found: " + key);
   } // get(K)
 
   /**
@@ -112,7 +139,15 @@ public class AssociativeArray<K, V> {
    * return false for the null key.
    */
   public boolean hasKey(K key) {
-    return false; // STUB
+    if (key == null) {
+      return false;
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        return true;
+      }
+    }
+    return false;
   } // hasKey(K)
 
   /**
@@ -121,7 +156,17 @@ public class AssociativeArray<K, V> {
    * in the associative array, does nothing.
    */
   public void remove(K key) {
-    // STUB
+    if (key == null) {
+      return; // Do nothing for null key
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        // Shift elements left to remove this entry
+        System.arraycopy(pairs, i + 1, pairs, i, size - i - 1);
+        pairs[--size] = null; // Clear last entry
+        return;
+      }
+    }
   } // remove(K)
 
   /**
@@ -139,7 +184,7 @@ public class AssociativeArray<K, V> {
    * Expand the underlying array.
    */
   void expand() {
-    this.pairs = java.util.Arrays.copyOf(this.pairs, this.pairs.length * 2);
+    this.pairs = Arrays.copyOf(this.pairs, this.pairs.length * 2);
   } // expand()
 
   /**
@@ -153,7 +198,28 @@ public class AssociativeArray<K, V> {
    *   If the key does not appear in the associative array.
    */
   int find(K key) throws KeyNotFoundException {
-    throw new KeyNotFoundException();   // STUB
+    if (key == null) {
+      throw new KeyNotFoundException("Key cannot be null");
+    }
+    for (int i = 0; i < this.size; i++) {
+      if (pairs[i].key.equals(key)) {
+        return i;
+      }
+    }
+    throw new KeyNotFoundException("Key not found: " + key);
   } // find(K)
 
+  // +--------------+
+  // | Inner Class  |
+  // +--------------+
+  
+  private static class KVPair<K, V> {
+    K key;
+    V value;
+
+    KVPair(K key, V value) {
+      this.key = key;
+      this.value = value;
+    }
+  }
 } // class AssociativeArray
