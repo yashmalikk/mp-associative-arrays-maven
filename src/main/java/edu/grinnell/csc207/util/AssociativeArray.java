@@ -75,9 +75,11 @@ public class AssociativeArray<K, V> {
   public String toString() {
     StringBuilder returnVal = new StringBuilder();
     for (int i = 0; i < this.size; i++) {
-      if (i > 0) returnVal.append(", ");
+      if (i > 0) {
+        returnVal.append(", ");
+      } // create , between key-value pair
       returnVal.append(pairs[i].key).append(":").append(pairs[i].value);
-    }
+    } // print "key:value".
     return "{" + returnVal + "}";
   } // toString()
 
@@ -100,16 +102,16 @@ public class AssociativeArray<K, V> {
   public void set(K key, V value) throws NullKeyException {
     if (key == null) {
       throw new NullKeyException("Key cannot be null");
-    }
+    } //NullKeyException.
     for (int i = 0; i < this.size; i++) {
       if (pairs[i].key.equals(key)) {
         pairs[i].value = value; // Update existing key
         return;
-      }
-    }
+      } // update all keys.
+    } // loop for entire dictionary.
     if (size >= pairs.length) {
       expand(); // Expand array if necessary
-    }
+    } // check if we need to expand.
     pairs[size++] = new KVPair<>(key, value); // Add new key/value pair
   } // set(K,V)
 
