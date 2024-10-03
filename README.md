@@ -1,7 +1,9 @@
 Associative Arrays
 ==================
 
-Starter code for a CSC-207 project on associative arrays.
+Mini-Project 4: Associative Arrays.
 
-_Students must replace the contents of this file with appropriate
-contents, including class, author, date, and URL._
+Made by: Yash Malik for CSC207 2024.
+
+This java projects allows you to create a "dictionary", where a value of type K is the key
+that contains the value of type V, where K and V can be any type.
